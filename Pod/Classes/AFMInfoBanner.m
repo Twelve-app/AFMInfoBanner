@@ -193,17 +193,15 @@ static const CGFloat kDefaultHideInterval = 2.0;
 
 - (void)updateConstraints
 {
-    NSDictionary *viewsDict = @{@"self": self, @"label": self.textLabel};
-
+    NSDictionary *viewsDict = @{@"self": self, @"label": self.textLabel,@"navBar":self.viewAboveBanner};
+    
     // Expand to the superview's width
     [self.superview addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]|"
                                                                            options:0 metrics:nil views:viewsDict]];
     // Place initial constraint exactly one frame above the bottom line of view above us
     // or above top of screen, if there is no such view. Assign it to property to animate later.
     CGFloat topOffset = -self.frame.size.height;
-    if (self.viewAboveBanner)
-        topOffset += CGRectGetMaxY(self.viewAboveBanner.frame);
-    NSArray *topConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(offset)-[self]"
+    NSArray *topConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[navBar]-offset-[self]"
                                                                       options:0
                                                                       metrics:@{@"offset": @(topOffset)}
                                                                         views:viewsDict];
@@ -275,7 +273,7 @@ static const CGFloat kDefaultHideInterval = 2.0;
         [self.superview layoutIfNeeded];
 
         // Target top layout after animation is one frame down
-        self.topSpacingConstraint.constant += self.topSpacing + self.frame.size.height;
+        self.topSpacingConstraint.constant = 0;
         [UIView animateWithDuration:kAnimationDuration animations:^{
             [self.superview layoutIfNeeded];
         } completion:^(BOOL finished) {
@@ -283,7 +281,7 @@ static const CGFloat kDefaultHideInterval = 2.0;
                 self.showCompletionBlock();
         }];
     } else {
-        self.topSpacingConstraint.constant += self.topSpacing + self.frame.size.height;
+        self.topSpacingConstraint.constant = 0;
         if (self.showCompletionBlock)
             self.showCompletionBlock();
     }
